@@ -8,7 +8,7 @@ use iced::{
     keyboard, window,
 };
 use liaison_core::{
-    Direction, Event, Message, Question, ReconnectMode, Session, SessionStatus, api::PatchSessionRequest,
+    Direction, Event, Message, MessageKind, Question, ReconnectMode, Session, SessionStatus, api::PatchSessionRequest,
     config::{Config, Desktop as DesktopConfig},
 };
 use std::{
@@ -90,6 +90,8 @@ pub struct App {
     /// Chat text size in pixels.
     pub text_size: u16,
     pub show_settings: bool,
+    /// Highest message id seen, so only new messages mark the window urgent.
+    last_message_id: i64,
     start_session: Option<String>,
 }
 
@@ -177,6 +179,7 @@ impl App {
             zoom: clamp_zoom(desktop.zoom),
             text_size,
             show_settings: false,
+            last_message_id: 0,
             start_session,
         };
         let tasks = Task::batch([
@@ -498,7 +501,8 @@ impl App {
                     window::Event::Focused => {
                         self.focused = true;
                         let read = self.selected.clone().map(|s| self.mark_read_if_visible(&s)).unwrap_or_else(Task::none);
-                        Task::batch([self.presence(), read])
+                        // Clear the urgent mark set by `attention` (most WMs also do this on focus).
+                        Task::batch([self.presence(), read, window::request_user_attention(id, None)])
                     }
                     window::Event::Unfocused => {
                         self.focused = false;
@@ -583,16 +587,17 @@ impl App {
                 Task::none()
             }
             Event::Message { message } => {
+                let attention = self.attention(&message);
                 let session = message.session_id.clone();
                 let is_selected = self.selected.as_deref() == Some(session.as_str());
                 if let Some(thread) = self.threads.get_mut(&session).filter(|t| t.loaded) {
                     let is_new = thread.messages.binary_search_by_key(&message.id, |m| m.id).is_err();
                     thread.upsert(message);
                     if is_selected && is_new && self.at_bottom {
-                        return self.snap();
+                        return Task::batch([self.snap(), attention]);
                     }
                 }
-                Task::none()
+                attention
             }
             Event::Question { question } => {
                 if let Some(thread) = self.threads.get_mut(&question.session_id) {
@@ -640,6 +645,27 @@ pub fn zoom_shortcut(key: &keyboard::Key, modifiers: keyboard::Modifiers) -> Opt
 }
 
 impl App {
+    /// Marks the window urgent for a new agent message while it is not focused, like Teams or
+    /// Discord: i3 (X11 urgency hint) and Hyprland (xdg-activation) highlight the window and its
+    /// workspace until it gets focus.
+    fn attention(&mut self, message: &Message) -> Task<Msg> {
+        let new = message.id > self.last_message_id;
+        self.last_message_id = self.last_message_id.max(message.id);
+        let from_agent = message.direction == Direction::FromAgent;
+        // Events re-sent for old messages (delivery or read updates) must not ring.
+        let recent = liaison_core::now_ms() - message.created_at < 60_000;
+        match self.window {
+            Some(id) if new && from_agent && recent && !self.focused => {
+                let level = match message.kind {
+                    MessageKind::Question | MessageKind::Permission => window::UserAttention::Critical,
+                    _ => window::UserAttention::Informational,
+                };
+                window::request_user_attention(id, Some(level))
+            }
+            _ => Task::none(),
+        }
+    }
+
     /// Saves theme, zoom and text size to config.toml (other settings there are kept).
     fn save_view_settings(&self) {
         let mut config = Config::load();

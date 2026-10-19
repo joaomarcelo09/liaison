@@ -106,8 +106,13 @@ impl Tray for LiaisonTray {
         items
     }
 
-    fn watcher_offline(&self, _reason: ksni::OfflineReason) -> bool {
-        true // keep running: the bar may come back (e.g. waybar restarted)
+    fn watcher_online(&self) {
+        tracing::info!("tray: status bar found, icon shown");
+    }
+
+    fn watcher_offline(&self, reason: ksni::OfflineReason) -> bool {
+        tracing::info!("tray: no status bar tray yet ({reason:?}); the icon will appear when one starts");
+        true // keep running: the bar may start later or come back (e.g. waybar restarted)
     }
 }
 
@@ -118,7 +123,9 @@ pub fn start(hub: SharedHub) {
     }
     tokio::spawn(async move {
         let tray = LiaisonTray { hub: hub.clone(), chats: unread_chats(&hub) };
-        let handle = match tray.spawn().await {
+        // The hub usually starts at login before the bar (waybar, snixembed on i3, …) is up:
+        // keep the icon waiting and register it as soon as a tray appears.
+        let handle = match tray.assume_sni_available(true).spawn().await {
             Ok(handle) => handle,
             Err(e) => {
                 tracing::warn!("tray icon unavailable: {e}");

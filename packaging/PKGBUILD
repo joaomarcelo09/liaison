@@ -4,7 +4,7 @@
 #     cd packaging && makepkg -si
 
 pkgname=liaison
-pkgver=0.2.1
+pkgver=0.2.3
 pkgrel=1
 pkgdesc="Desktop messenger between you and your AI agents (Claude Code, opencode)"
 arch=('x86_64')
