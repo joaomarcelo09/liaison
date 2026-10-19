@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5b8cff"/>
+      <stop offset="1" stop-color="#3a56d4"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="120" height="120" rx="28" fill="url(#bg)"/>
+  <!-- the user's bubble -->
+  <path d="M26 30h46a10 10 0 0 1 10 10v20a10 10 0 0 1-10 10H44l-12 10v-10h-6a10 10 0 0 1-10-10V40a10 10 0 0 1 10-10z" fill="#ffffff"/>
+  <!-- the agent's bubble -->
+  <path d="M60 58h42a10 10 0 0 1 10 10v20a10 10 0 0 1-10 10h-6v10l-12-10H60a10 10 0 0 1-10-10V68a10 10 0 0 1 10-10z" fill="#c9d7ff" stroke="#3a56d4" stroke-width="4"/>
+  <circle cx="68" cy="78" r="4.5" fill="#3a56d4"/>
+  <circle cx="81" cy="78" r="4.5" fill="#3a56d4"/>
+  <circle cx="94" cy="78" r="4.5" fill="#3a56d4"/>
+</svg>

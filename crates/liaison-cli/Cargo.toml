@@ -1,0 +1,22 @@
+[package]
+name = "liaison-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Liaison command line: MCP server, agent hooks and connectors"
+
+[[bin]]
+name = "liaison"
+path = "src/main.rs"
+
+[dependencies]
+liaison-core.workspace = true
+anyhow.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+clap.workspace = true
+rmcp.workspace = true
+schemars.workspace = true
+chrono.workspace = true
+libc.workspace = true

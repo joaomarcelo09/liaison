@@ -1,0 +1,40 @@
+[workspace]
+resolver = "2"
+members = ["crates/*"]
+
+[workspace.package]
+version = "0.2.1"
+edition = "2024"
+license = "MIT"
+authors = ["joaogomes"]
+
+[workspace.dependencies]
+liaison-core = { path = "crates/liaison-core" }
+anyhow = "1"
+thiserror = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["full"] }
+tokio-stream = "0.1"
+futures = "0.3"
+bytes = "1"
+http = "1"
+http-body-util = "0.1"
+hyper = { version = "1", features = ["client", "http1"] }
+hyper-util = { version = "0.1", features = ["tokio"] }
+axum = "0.8"
+rusqlite = { version = "0.40", features = ["bundled"] }
+ulid = "3"
+clap = { version = "4", features = ["derive"] }
+directories = "6"
+toml = "1"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+notify-rust = "4"
+ksni = "0.3"
+resvg = { version = "0.48", default-features = false }
+rmcp = { version = "3", features = ["server", "transport-io", "macros"] }
+schemars = "1"
+iced = { version = "0.14", features = ["tokio", "markdown", "advanced"] }
+chrono = "0.4"
+libc = "0.2"

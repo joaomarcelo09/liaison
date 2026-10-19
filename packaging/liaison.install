@@ -1,0 +1,22 @@
+post_install() {
+  cat <<'MSG'
+==> Liaison installed. Two steps to start:
+      systemctl --user enable --now liaison-hub     # start the hub (and at every login)
+      liaison connect                               # hook up Claude Code / opencode
+    Then open "Liaison" from your launcher. Restart running agent sessions to connect them.
+MSG
+}
+
+post_upgrade() {
+  cat <<'MSG'
+==> Restart the hub to use the new version:
+      systemctl --user restart liaison-hub
+MSG
+}
+
+pre_remove() {
+  cat <<'MSG'
+==> Before removing, run `liaison disconnect claude-code` and `liaison disconnect opencode`
+    so the agents stop calling /usr/bin/liaison.
+MSG
+}

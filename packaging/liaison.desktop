@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Liaison
+GenericName=Agent Messenger
+Comment=Chat with your AI agents (Claude Code, opencode)
+Exec=liaison-desktop
+Icon=liaison
+Terminal=false
+Categories=Network;InstantMessaging;Development;
+Keywords=ai;agent;claude;opencode;chat;messenger;
+StartupWMClass=liaison
+StartupNotify=true

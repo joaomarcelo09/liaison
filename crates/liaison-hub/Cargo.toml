@@ -1,0 +1,29 @@
+[package]
+name = "liaison-hub"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Liaison hub: stores and routes messages between you and your AI agents"
+
+[[bin]]
+name = "liaison-hub"
+path = "src/main.rs"
+
+[dependencies]
+liaison-core.workspace = true
+anyhow.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+tokio-stream.workspace = true
+futures.workspace = true
+bytes.workspace = true
+axum.workspace = true
+rusqlite.workspace = true
+ulid.workspace = true
+toml.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+notify-rust.workspace = true
+ksni.workspace = true
+resvg.workspace = true

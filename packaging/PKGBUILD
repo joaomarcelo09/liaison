@@ -1,0 +1,50 @@
+# Maintainer: joaogomes <jmjoao73@hotmail.com>
+#
+# Builds the package from this source tree:
+#     cd packaging && makepkg -si
+
+pkgname=liaison
+pkgver=0.2.1
+pkgrel=1
+pkgdesc="Desktop messenger between you and your AI agents (Claude Code, opencode)"
+arch=('x86_64')
+license=('MIT')
+depends=('gcc-libs' 'glibc' 'libxkbcommon' 'wayland' 'fontconfig' 'ttf-liberation')
+makedepends=('cargo')
+optdepends=(
+  'vulkan-icd-loader: GPU-accelerated rendering'
+  'claude-code: Claude Code agent sessions'
+  'opencode: opencode agent sessions'
+)
+install=liaison.install
+options=('!lto' '!debug')
+
+_root() {
+  realpath "$startdir/.."
+}
+
+build() {
+  cd "$(_root)"
+  export CARGO_TARGET_DIR="$(_root)/target"
+  cargo build --release --locked --workspace
+}
+
+check() {
+  cd "$(_root)"
+  export CARGO_TARGET_DIR="$(_root)/target"
+  cargo test --release --locked --workspace
+}
+
+package() {
+  local root
+  root="$(_root)"
+  install -Dm755 "$root/target/release/liaison" "$pkgdir/usr/bin/liaison"
+  install -Dm755 "$root/target/release/liaison-hub" "$pkgdir/usr/bin/liaison-hub"
+  install -Dm755 "$root/target/release/liaison-desktop" "$pkgdir/usr/bin/liaison-desktop"
+  install -Dm644 "$startdir/liaison-hub.service" "$pkgdir/usr/lib/systemd/user/liaison-hub.service"
+  install -Dm644 "$startdir/liaison.desktop" "$pkgdir/usr/share/applications/liaison.desktop"
+  install -Dm644 "$startdir/liaison.svg" "$pkgdir/usr/share/icons/hicolor/scalable/apps/liaison.svg"
+  install -Dm644 "$root/README.md" "$pkgdir/usr/share/doc/liaison/README.md"
+  install -Dm644 "$root/PLAN.md" "$pkgdir/usr/share/doc/liaison/PLAN.md"
+  install -Dm644 "$root/LICENSE" "$pkgdir/usr/share/licenses/liaison/LICENSE"
+}
